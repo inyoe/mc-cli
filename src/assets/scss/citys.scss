@@ -1,0 +1,5 @@
+.citys-container{ padding-bottom:30px; background-color:#fff; }
+.citys-container dl dt{ height:30px; padding:0 15px; line-height:30px; font-size:17px; font-weight:bold; background-color:#f2f2f0; color:#000; }
+.citys-container dl dd{ position:relative; height:40px; margin:0 15px; line-height:40px; font-size:15px; color:#000; }
+.citys-container dl dd:last-of-type:after{ content:none; }
+.letter-sort{ position:fixed; right:0; top:50%; width:15px; padding-left:20px; line-height:16px; font-size:15px; font-weight:bold; color:#000; text-align:center; transform:translateY(-50%); }
