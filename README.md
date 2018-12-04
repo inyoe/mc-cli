@@ -22,8 +22,8 @@
 
 ## DETAILS
 **./gulpconfig.js**
-
-`module.exports = {
+```
+module.exports = {
     path: {
         DIST:   'dist/',
         SOURCE: 'src/',
@@ -83,4 +83,5 @@
         KEYWORDS: 'keywords..',         //头部Keywords
         DESCRIPTION: 'description...'   //头部Description
     }
-}`
+}
+```
