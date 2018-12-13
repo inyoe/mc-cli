@@ -258,7 +258,7 @@ gulp.task('htmlFormatModule', fnHtmlFormatModule)
 
 
 gulp.task('clearDist', () => {
-    return del([DIST + '**/**', revPath + '**/**']);
+    return del([DIST + '**/**', revPath + '**/**', SOURCE_VIEW + '**/**', SOURCE_CSS + '**/**']);
 })
 
 
@@ -297,6 +297,16 @@ gulp.task('browserSync', () => {
           totalRouter = {},
           _STATIC = STATIC.charAt(STATIC.length - 1) === '/' ? STATIC.substring(0, STATIC.length - 1) : STATIC;
 
+    const logDataList = (data, title, showValue=false) => {
+        if (data) {
+            console.log(`[\u001b[32m${title}\u001b[0m]:\n --------------------------------------`);
+            for (let key in data) {
+                console.log('    ' + key + (showValue ? ' \u001b[36m-->\u001b[0m ' + data[key] : ''));
+            }
+            console.log(' --------------------------------------\n');
+        }
+    }
+
     let middlewareProxy;
 
     if (key) {
@@ -329,14 +339,15 @@ gulp.task('browserSync', () => {
     }
     totalRouter['/' + _STATIC] = SOURCE + _STATIC;
 
-    console.log(totalRouter)
+    logDataList(totalRouter, 'Route', true);
+    logDataList(mockList, 'Mock');
 
     browserSync.init({
         open: 'external',
         port: config.port,
         server: {
             baseDir: SOURCE_VIEW,
-            middleware: [middlewareProxy],
+            middleware: middlewareProxy ? [middlewareProxy] : null,
             routes: totalRouter
         },
         startPath: config.startPath
@@ -344,7 +355,12 @@ gulp.task('browserSync', () => {
 
     gulp.watch(SOURCE_JS + '**/*.js').on('change', browserSync.reload);
     gulp.watch(SOURCE_IMG + '**/*.*', browserSync.reload);
-    gulp.watch(sSprite + '*.png', gulp.series('sprite'));
+    gulp.watch(sSprite + '*.png').on('change', () => {
+        setTimeout(() => {
+            fnSprite();
+            browserSync.reload();
+        }, 500);
+    });
     gulp.watch(SOURCE_SCSS + '**/*.scss').on('change', file => fnScss(file));
     gulp.watch(SOURCE_HTML + '**/*.html').on('change', file => {
         fnHtmlInclude(file);
@@ -353,7 +369,10 @@ gulp.task('browserSync', () => {
     gulp.watch(SOURCE_PUBLIC + '*.html').on('change', gulp.series('htmlInclude', browserSync.reload));
     gulp.watch(MOCK_MODULES).on('change', () => {
         mockList = require('./mock')();
-        setTimeout(browserSync.reload, 100);
+        setTimeout(() => {
+            logDataList(mockList, 'Mock');
+            browserSync.reload();
+        }, 100);
     })
 })
 
