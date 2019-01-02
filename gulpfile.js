@@ -56,25 +56,40 @@ const OTHER_FILES = config.others.map((item) => {
 
 gulp.task('jsUglify', () => {
     const source = [SOURCE_JS + '**/*.js'],
-          replaceList = config.replace.js;
+          replaceList = config.replace.js,
+          { key, removeKey } = config.proxy,
+          pathDir = fs.readdirSync(SOURCE_JS),
+          folders = [];
 
     EXCLUDE_JS.forEach((item) => {
         source.push('!' + SOURCE_JS + item);
     })
 
+    pathDir.forEach((item, index) => {
+        const fileState = fs.statSync(`${SOURCE_JS}/${item}`);
+        fileState.isDirectory() && folders.push(item);
+    })
+
     let stream = gulp.src(source);
 
+    if (removeKey && key) {
+        replaceList.push([key, '']);
+    }
     replaceList.forEach((item, index) => {
         stream = stream.pipe(replace(item[0], item[1]));
     })
 
-    return stream.pipe(uglify())
-    		.pipe(rev())
-    		.pipe(gulp.dest(DIST_JS))
-    		.pipe(rev.manifest('rev-js.json'))
-            .pipe(replace(/\"module\/(\S*\.js)\"/g, '\"$1\"'))
-            .pipe(replace(/\"(\S*\/\S*)\.js\"/g, '\"$1\"'))
-    		.pipe(gulp.dest(revPath));
+    stream = stream.pipe(uglify())
+            .pipe(rev())
+            .pipe(gulp.dest(DIST_JS))
+            .pipe(rev.manifest('rev-js.json'));
+
+    folders.forEach((item, index) => {
+        const rule = new RegExp(item === 'module' ? `"${item}\/(\\S+\\.js)"` : `"(${item}\/\\S+)\\.js"`, 'g');
+        stream = stream.pipe(replace(rule, '"$1"'));
+    })
+
+    return stream.pipe(gulp.dest(revPath));
 })
 
 
