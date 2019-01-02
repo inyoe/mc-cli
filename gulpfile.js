@@ -277,7 +277,7 @@ gulp.task('clearDist', () => {
 })
 
 
-gulp.task('sprite', () => {
+const fnSprite = () => {
     const spriteData = gulp.src([sSprite + 'i-*.png'])
         .pipe(spritesmith({
         imgName: 'sprite.png',
@@ -303,7 +303,9 @@ gulp.task('sprite', () => {
         .pipe(gulp.dest(SOURCE_SCSS));
 
     return merge(imgStream, cssStream);
-});
+}
+
+gulp.task('sprite', fnSprite);
 
 
 gulp.task('browserSync', () => {
