@@ -34,7 +34,7 @@ gulp.task('browserSync', function() {
     if (KEY) {
         middlewareProxy = TARGET ? 
                             proxyMiddleware(KEY, {
-                                TARGET,
+                                target: TARGET,
                                 changeOrigin: true,
                                 pathRewrite: function(path, req) {
                                     return REMOVE_KEY ? path.replace(KEY, '') : path;
